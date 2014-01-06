@@ -78,7 +78,7 @@ L.Control.Distance = L.Control.extend({
 		this._container.removeChild(this._text);
 		L.DomUtil.removeClass(this._link, 'leaflet-control-distance-active');
 		this._active = false;
-		this._line.editing.disable();
+		//this._line.editing.disable();
 	},
 
 	_add_point: function (e) {

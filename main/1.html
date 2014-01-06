@@ -1,93 +1,68 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Leaflet.TextPath</title>
+<title>Leaflet Draw</title>
 
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
-    <link rel="stylesheet" href="../jslib/css/fontawe.css" />
-
-    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
-    <script src="../jslib/leaf/textlabel.js"></script>
-    <style>
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%
-        }
-        .help {
-            font-size: 1.5em;
-            position: absolute;
-            top:0;
-            left: 0;
-            right: 0;
-            height: 30px;
-            z-index: 10;
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            padding: 10px;
-            margin: 0px;
-            text-align: center;
-        }
-        .help a.sources {
-            float: left;
-            margin-left: 50px;
-            color: white;
-        }
-        .help a.logo {
-            float: right;
-        }
-        .help a.logo img {
-            height: 30px;
-        }
-    </style>
+    <link rel="stylesheet" href="../jslib/css/draw.css" />
+    <link rel="stylesheet" href="../jslib/css/leaflet.css" />
+    <!-- 
+    <link rel="stylesheet" href="../jslib/css/draw_measure.css" />
+    <link rel="stylesheet" href="../jslib/css/fontawe.css" /> 
+<script src="../jslib/control/leaflet.measurecontrol.js"></script>
+    -->
+    <script src="../jslib/leaf/leaflet.js"></script>
+    <script src="../jslib/control/leaflet.draw.js"></script>
 </head>
 <body>
+    <div id="map" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+    
+    <script>
+    
+        var cloudmadeUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png',
+            cloudmade = new L.TileLayer(cloudmadeUrl, {maxZoom: 18}),
+            map = new L.Map('map', {layers: [cloudmade], center: new L.LatLng(-37.7772, 175.2756), zoom: 15 });
 
-    <p class="help">Decorate polylines with text
-      <a class="sources" href="http://github.com/makinacorpus/Leaflet.TextPath/">Sources</a>
-      <a class="logo" href="http://makina-corpus.com"><img src="http://depot.makina-corpus.org/public/logo.gif"/></a>
-    </p>
-    <div id="map"></div>
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
 
-    <script type="text/javascript">
-        var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; 2013 OpenStreetMap contributors',
+        var drawControl = new L.Control.Draw({
+            draw: {
+                position: 'topleft',
+                polygon: {
+                    title: 'Draw a sexy polygon!',
+                    allowIntersection: false,
+                    drawError: {
+                        color: '#b00b00',
+                        timeout: 1000
+                    },
+                    shapeOptions: {
+                        color: '#bada55'
+                    },
+                    showArea: true
+                },
+                polyline: {
+                    metric: false
+                },
+                circle: {
+                    shapeOptions: {
+                        color: '#662d91'
+                    }
+                }
+            },
+            edit: {
+                featureGroup: drawnItems
+            }
         });
+        map.addControl(drawControl);
 
-        var map = L.map('map')
-                   .fitWorld()
-                   .addLayer(osm);
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+                layer = e.layer;
 
-        var wind = L.polyline([[59.3556, -31.99219],[55.17887, -42.89062],[47.7541, -43.94531],[38.27269, -37.96875],[27.05913, -41.13281],[16.29905, -36.5625],[8.40717, -30.23437],[1.05463, -22.5],[-8.75479, -18.28125],[-21.61658, -20.03906],[-31.35364, -24.25781],[-39.90974, -30.9375],[-43.83453, -41.13281],[-47.7541, -49.92187],[-50.95843, -54.14062],[-55.9738, -56.60156]], {
-                    weight: 15,
-                    color: '#8EE9FF'
-                }).addTo(map);
-        wind.setText(') ', {repeat: true,
-                            offset: 7,
-                            attributes: {fill: '#007DEF',
-                                         'font-weight': 'bold',
-                                         'font-size': '24'}});
+            if (type === 'marker') {
+                layer.bindPopup('A popup!');
+            }
 
-        var danger = L.polyline([[-40.311, -31.952], [-12.086, -18.727]], {
-                weight: 10,
-                color: 'orange',
-                opacity: 0.8
-            }).addTo(map);
-        danger.setText('\u25BA', {repeat: true,
-                                  offset: 6,
-                                  attributes: {fill: 'red'}});
-
-        var plane = L.polyline([[-49.38237, -37.26562],[-1.75754, -14.41406],[51.61802, -23.20312]], {
-                weight: 1,
-                color: 'black',
-                dashArray: '2, 2'
-            }).addTo(map);
-        plane.setText('\u2708     ', {repeat: true,
-                                      offset: 8,
-                                      attributes: {'font-weight': 'bold',
-                                                   'font-size': '24'}});
+            drawnItems.addLayer(layer);
+        });
+        
     </script>
 </body>
 </html>

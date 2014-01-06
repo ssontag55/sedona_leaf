@@ -6,15 +6,19 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="../jslib/leaf/leaflet.css" />
-	<link rel="stylesheet" href="../jslib/css/distance.css" />
-	<script src="../jslib/leaf/leaflet_sedona.js"></script>
+	<link rel="stylesheet" href="../jslib/css/draw.css" />
+	<link rel="stylesheet" href="../jslib/css/fontawe.css" /> 
+	<link rel="stylesheet" href="../jslib/css/leaflet.css" />
+	<link rel="stylesheet" href="../jslib/css/draw_measure.css" />
+	<script src="../jslib/leaf/leaflet.js"></script>
+    <script src="../jslib/control/leaflet.draw.js"></script>
+	<script src="../jslib/control/leaflet.measurecontrol.js"></script>
 	<script src="../jslib/layer/vector/GPX.js"></script>
 	<script src="../jslib/control/Scale.js"></script>
     <script src="../jslib/control/Permalink.js"></script>
     <script src="../jslib/control/Permalink.Line.js"></script>
-    <script src="../jslib/control/Distance.js"></script>
     <script src="../jslib/leaf/textlabel.js"></script>
+    <script src="../jslib/leaf/leaflet.label.js"></script>
 	<!--[if lte IE 8]><link rel="stylesheet" href="../dist/leaflet.ie.css" /><![endif]-->
 	<style>
 		body {
@@ -46,22 +50,22 @@
 			text-decoration:underline;
 		}
 		button.css3button {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 14px;
-	color: #ebebeb;
-	padding: 6px 7px;
-	background: -moz-linear-gradient(
-		top,
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 14px;
+			color: #ebebeb;
+			padding: 6px 7px;
+			background: -moz-linear-gradient(
+			top,
 		#2119ff 0%,
 		#0009ab);
-	background: -webkit-gradient(
+			background: -webkit-gradient(
 		linear, left top, left bottom, 
 		from(#2119ff),
 		to(#0009ab));
 	-moz-border-radius: 21px;
 	-webkit-border-radius: 21px;
-	border-radius: 21px;
-	border: 1px solid #e8dfdf;
+			border-radius: 21px;
+			border: 1px solid #e8dfdf;
 	-moz-box-shadow:
 		0px 1px 3px rgba(000,000,000,1),
 		inset 0px 0px 2px rgba(255,255,255,0.7);
@@ -75,7 +79,10 @@
 		0px -1px 0px rgba(000,000,000,0.4),
 		0px 1px 0px rgba(255,255,255,0.3);
 		}
-
+		
+		.leaflet-control.enabled a {
+            background-color: yellow;
+        }
 	</style>
 </head>
 
@@ -90,7 +97,7 @@
 		var status2 = "none";
 		
 		var cloudmadeAttribution = 'OpenStreetMap',
-				cloudmadeOptions = {maxZoom: 15, minZoom: 5, attribution: cloudmadeAttribution},
+				cloudmadeOptions = {maxZoom: 18, minZoom: 5, attribution: cloudmadeAttribution},
 				cloudmadeUrl= 'http://{s}.tiles.mapbox.com/v3/asamap.map-p0q0dl08/{z}/{x}/{y}.png',
 				cloudmadeUrl2= 'http://{s}.tiles.mapbox.com/v3/ssontag55.map-qvwdjm8r/{z}/{x}/{y}.png',
 				cloudmadeUrlOSM= 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png';
@@ -99,7 +106,6 @@
 			minimal2 = new L.TileLayer(cloudmadeUrl2, cloudmadeOptions, {styleId: 22677}),
 			midnightCommander = new L.TileLayer(cloudmadeUrlOSM, cloudmadeOptions, {styleId: 999});
 		var track = new L.GPX("sedona.gpx", {async: true, color: "#2D6BA4",smoothFactor:.1,weight:4,opacity:0.8});
-		
 
 		var map = new L.Map('map', {center: new L.LatLng(34.9, -111.76), mousewheel:true, crs:L.CRS.EPSG3857,zoom: 12, layers: [minimal,track],maxZoom:21});	
 
@@ -122,11 +128,55 @@
 		
 		var circle = new L.Circle();
 		var mytrack;
-		
+
+		var drawnItems = new L.FeatureGroup();
+		map.addLayer(drawnItems);
+		var drawControl = new L.Control.Draw({
+			draw: {
+				position: 'topleft',
+				polygon: {
+					title: 'Draw a polygon!',
+					allowIntersection: false,
+					drawError: {
+						color: '#b00b00',
+						timeout: 1000
+					},
+					shapeOptions: {
+						color: '#bada55'
+					},
+					showArea: true
+				},
+				polyline: {
+					metric: false
+				},
+				circle: {
+					shapeOptions: {
+						color: '#662d91'
+					}
+				}
+			},
+			edit: {
+				featureGroup: drawnItems
+			}
+		});
+
+		map.on('draw:created', function (e) {
+			var type = e.layerType,
+				layer = e.layer;
+
+			if (type === 'marker') {
+				layer.bindPopup('A popup!');
+			}
+
+			drawnItems.addLayer(layer);
+		});
+
+		map.addControl(drawControl);		
+		//map.addControl(new L.Control.measureControl());
+		L.Control.measureControl().addTo(map);
 		map.addControl(new L.Control.Scale());
 		map.addControl(new L.Control.Permalink({text: 'Permalink', layers: layersControl}));
 
-		map.addControl(new L.Control.Distance());
 		
 		function clearhighlight(){
 			for(var index  in map._layers) {

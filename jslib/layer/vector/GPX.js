@@ -213,9 +213,17 @@ L.GPX = L.FeatureGroup.extend({
         //options.marker_options.titleName = name[i].textContent;
         var l = new L.Polyline(coords, options);
         if(name[i]){
+          l.bindLabel(name[i].textContent, { direction: 'auto' })
           l.bindPopup(name[i].textContent + ' ID: ' + i);
         }
         l.on("click",this.clickindividualSeg);
+        /*
+        add label
+        l.setText(name[i].textContent, {repeat: false,
+                            offset: 6,
+                            attributes: {fill: '#A2122F',
+                                         'font-weight': 'normal',
+                                         'font-size': '20'}});*/
 
         this.fire('addline', { line: l})
         layers.push(l);
