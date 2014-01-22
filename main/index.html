@@ -105,7 +105,7 @@
 		var minimal = new L.TileLayer(cloudmadeUrl, cloudmadeOptions, {styleId: 22677}),
 			minimal2 = new L.TileLayer(cloudmadeUrl2, cloudmadeOptions, {styleId: 22677}),
 			midnightCommander = new L.TileLayer(cloudmadeUrlOSM, cloudmadeOptions, {styleId: 999});
-		var track = new L.GPX("sedona.gpx", {async: true, color: "#2D6BA4",smoothFactor:.1,weight:4,opacity:0.8});
+		var track = new L.GPX("sedona.gpx", {async: true, color: "#2D6BA4",smoothFactor:.1,weight:2,opacity:0.8});
 
 		var map = new L.Map('map', {center: new L.LatLng(34.9, -111.76), mousewheel:true, crs:L.CRS.EPSG3857,zoom: 12, layers: [minimal,track],maxZoom:21});	
 

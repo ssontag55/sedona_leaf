@@ -262,7 +262,7 @@ L.GPX = L.FeatureGroup.extend({
        //map.removeLayer(map._layers[index])
       }
     };
-    var hl = new L.Polyline(e.target._latlngs, {async: true, color: "#E13A54",smoothFactor:.1,weight:6,opacity:0.8});
+    var hl = new L.Polyline(e.target._latlngs, {async: true, color: "#E13A54",smoothFactor:.1,weight:2,opacity:0.8});
     hl.id = 'new';
     map.addLayer(hl);
    //map.fitBounds(e.target.getBounds());
